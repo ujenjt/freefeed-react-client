@@ -1014,6 +1014,10 @@ export function subscribers(state = {}, action) {
   }
 
   switch (action.type) {
+    case ActionTypes.REALTIME_POST_NEW:
+    case ActionTypes.REALTIME_COMMENT_NEW: {
+      return mergeByIds(state, (action.subscribers || []).map(userParser))
+    }
     case response(ActionTypes.GET_SINGLE_POST):
     case response(ActionTypes.CREATE_POST): {
       return mergeByIds(state, (action.payload.subscribers || []).map(userParser))
@@ -1044,12 +1048,12 @@ export function authenticated(state = !!getToken(), action) {
   return state
 }
 
-const initUser = {
+const initUser = _ => ({
   frontendPreferences: frontendPrefsConfig.defaultValues,
   ...getPersistedUser()
-}
+})
 
-export function user(state = initUser, action) {
+export function user(state = initUser(), action) {
   if (ActionHelpers.isUserChangeResponse(action) ||
       action.type === response(ActionTypes.WHO_AM_I) ||
       action.type === response(ActionTypes.SIGN_UP)){
